@@ -1,4 +1,4 @@
-/**
+/*!
  * jQuery Internationalization library
  *
  * Copyright (C) 2012 Santhosh Thottingal
@@ -75,7 +75,7 @@
 						break;
 					}
 
-					locale = ( $.i18n.fallbacks[i18n.locale] && $.i18n.fallbacks[i18n.locale][fallbackIndex] ) ||
+					locale = ( $.i18n.fallbacks[ i18n.locale ] && $.i18n.fallbacks[ i18n.locale ][ fallbackIndex ] ) ||
 						i18n.options.fallbackLocale;
 					$.i18n.log( 'Trying fallback locale for ' + i18n.locale + ': ' + locale );
 
@@ -132,9 +132,9 @@
 		 * If the data argument is null/undefined/false,
 		 * all cached messages for the i18n instance will get reset.
 		 *
-		 * @param {String|Object} source
-		 * @param {String} locale Language tag
-		 * @returns {jQuery.Promise}
+		 * @param {string|Object} source
+		 * @param {string} locale Language tag
+		 * @return {jQuery.Promise}
 		 */
 		load: function ( source, locale ) {
 			var fallbackLocales, locIndex, fallbackLocale, sourceMap = {};
@@ -142,16 +142,16 @@
 				source = 'i18n/' + $.i18n().locale + '.json';
 				locale = $.i18n().locale;
 			}
-			if ( typeof source === 'string'	&&
+			if ( typeof source === 'string' &&
 				source.split( '.' ).pop() !== 'json'
 			) {
 				// Load specified locale then check for fallbacks when directory is specified in load()
-				sourceMap[locale] = source + '/' + locale + '.json';
-				fallbackLocales = ( $.i18n.fallbacks[locale] || [] )
+				sourceMap[ locale ] = source + '/' + locale + '.json';
+				fallbackLocales = ( $.i18n.fallbacks[ locale ] || [] )
 					.concat( this.options.fallbackLocale );
 				for ( locIndex in fallbackLocales ) {
-					fallbackLocale = fallbackLocales[locIndex];
-					sourceMap[fallbackLocale] = source + '/' + fallbackLocale + '.json';
+					fallbackLocale = fallbackLocales[ locIndex ];
+					sourceMap[ fallbackLocale ] = source + '/' + fallbackLocale + '.json';
 				}
 				return this.load( sourceMap );
 			} else {
@@ -172,7 +172,7 @@
 			// FIXME: This changes the state of the I18N object,
 			// should probably not change the 'this.parser' but just
 			// pass it to the parser.
-			this.parser.language = $.i18n.languages[$.i18n().locale] || $.i18n.languages['default'];
+			this.parser.language = $.i18n.languages[ $.i18n().locale ] || $.i18n.languages[ 'default' ];
 			if ( message === '' ) {
 				message = key;
 			}
@@ -234,10 +234,23 @@
 		String.locale = i18n.locale;
 		return this.each( function () {
 			var $this = $( this ),
-				messageKey = $this.data( 'i18n' );
+				messageKey = $this.data( 'i18n' ),
+				lBracket, rBracket, type, key;
 
 			if ( messageKey ) {
-				$this.text( i18n.parse( messageKey ) );
+				lBracket = messageKey.indexOf( '[' );
+				rBracket = messageKey.indexOf( ']' );
+				if ( lBracket !== -1 && rBracket !== -1 && lBracket < rBracket ) {
+					type = messageKey.slice( lBracket + 1, rBracket );
+					key = messageKey.slice( rBracket + 1 );
+					if ( type === 'html' ) {
+						$this.html( i18n.parse( key ) );
+					} else {
+						$this.attr( type, i18n.parse( key ) );
+					}
+				} else {
+					$this.text( i18n.parse( messageKey ) );
+				}
 			} else {
 				$this.find( '[data-i18n]' ).i18n();
 			}
@@ -262,7 +275,7 @@
 		parse: function ( message, parameters ) {
 			return message.replace( /\$(\d+)/g, function ( str, match ) {
 				var index = parseInt( match, 10 ) - 1;
-				return parameters[index] !== undefined ? parameters[index] : '$' + match;
+				return parameters[ index ] !== undefined ? parameters[ index ] : '$' + match;
 			} );
 		},
 		emitter: {}

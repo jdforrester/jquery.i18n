@@ -13,7 +13,6 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-jscs' );
 
 	grunt.initConfig( {
-		pkg: grunt.file.readJSON( 'package.json' ),
 		connect: {
 			server: {
 				options: {
@@ -26,7 +25,7 @@ module.exports = function ( grunt ) {
 			options: {
 				jshintrc: true
 			},
-			all: [ 'src/**/*.js' ]
+			all: [ '*.js', 'src/**/*.js' ]
 		},
 		jscs: {
 			fix: {
@@ -42,7 +41,6 @@ module.exports = function ( grunt ) {
 		watch: {
 			files: [
 				'.{jscsrc,jshintignore,jshintrc}',
-				'Gruntfile.js',
 				'<%= jshint.all %>'
 			],
 			tasks: 'test'
